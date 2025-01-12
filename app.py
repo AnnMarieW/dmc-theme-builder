@@ -1,5 +1,6 @@
 import json
 import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 from dash import Dash, _dash_renderer, Input, Output, State, callback
 from components import progress_card
 from components import theme_switch
@@ -100,6 +101,15 @@ see_code = dmc.Box(
     ]
 )
 
+github_link =  dmc.Anchor(
+    dmc.ActionIcon(
+        DashIconify(icon= "radix-icons:github-logo", width=25), variant="transparent", size="lg"
+    ),
+    href="https://github.com/AnnMarieW/dmc-theme-builder",
+    target="_blank",
+    visibleFrom="xs",
+)
+
 
 sample_app = dmc.Box(
     [
@@ -120,7 +130,10 @@ sample_app = dmc.Box(
 
 layout = dmc.Container(
     [
-        dmc.Title("Dash Mantine Components Theme Builder", order=1, mt="lg"),
+        dmc.Group([
+            dmc.Title("Dash Mantine Components Theme Builder", order=1, mt="lg"),
+            github_link
+        ], justify="space-between"),
         dmc.Title(
             "Set default color, radius, shadow, and color scheme", order=3, mb="lg"
         ),
