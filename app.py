@@ -86,7 +86,7 @@ customize_theme = dmc.Box(
 
 see_code = dmc.Box(
     [
-        dmc.Button("See code", id="modal-code-button", variant="outline"),
+        dmc.Button("copy theme code", id="modal-code-button", variant="outline"),
         dmc.Modal(
             [
                 dmc.CodeHighlight(id="json", code="", language="json", h=300),
