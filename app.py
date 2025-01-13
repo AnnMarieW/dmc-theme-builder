@@ -19,8 +19,6 @@ color_picker_value_mapping = {color: codes[5] for color, codes in colors.items()
 theme_name_mapping = {codes[5]: color for color, codes in colors.items() if color != "dark"}
 size_name_mapping = {1: "xs", 2: "sm", 3: "md", 4: "lg", 5: "xl"}
 
-print(color_picker_value_mapping)
-
 color_picker = dmc.Stack(
     [
         dmc.Text("Color", size="xs"),
@@ -144,7 +142,7 @@ layout = dmc.Container(
         dmc.Space(h=60),
         sample_app,
     ],
-    fluid=True,
+ #   fluid=True,
     mb="lg",
 )
 
