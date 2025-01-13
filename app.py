@@ -15,13 +15,15 @@ _dash_renderer._set_react_version("18.2.0")
 app = Dash(external_stylesheets=dmc.styles.ALL)
 
 colors = dmc.DEFAULT_THEME["colors"]
-color_picker_value_mapping = {color: codes[6] for color, codes in colors.items()}
-theme_name_mapping = {codes[6]: color for color, codes in colors.items()}
-radius_name_mapping = {1: "xs", 2: "sm", 3: "md", 4: "lg", 5: "xl"}
+color_picker_value_mapping = {color: codes[5] for color, codes in colors.items() if color != "dark"}
+theme_name_mapping = {codes[5]: color for color, codes in colors.items() if color != "dark"}
+size_name_mapping = {1: "xs", 2: "sm", 3: "md", 4: "lg", 5: "xl"}
+
+print(color_picker_value_mapping)
 
 color_picker = dmc.Stack(
     [
-        dmc.Text("Select a theme color", size="xs"),
+        dmc.Text("Color", size="xs"),
         dmc.ColorPicker(
             id="color-picker",
             size="sm",
@@ -37,7 +39,7 @@ color_picker = dmc.Stack(
 def make_slider(title, id):
     return dmc.Stack(
         [
-            dmc.Text(title, size="xs", fw=500),
+            dmc.Text(title, size="sm"),
             dmc.Slider(
                 min=1,
                 max=5,
@@ -63,14 +65,14 @@ customize_theme = dmc.Box(
         dmc.Button("Customize Theme", id="modal-demo-button"),
         dmc.Modal(
             id="modal-customize",
-            size="xs",
+            size="sm",
             children=[
                 dmc.Box(
                     [
                         color_picker,
-                        make_slider("Select Radius", "radius"),
-                        make_slider("Select Shadow", "shadow"),
-                        theme_switch.theme_toggle,
+                        make_slider("Radius", "radius"),
+                        make_slider("Shadow", "shadow"),
+                        dmc.Group([theme_switch.theme_toggle, dmc.Text("light/dark color scheme", size="sm", pt="sm")])
                     ],
                     bd="1px solid gray.3",
                     p="sm",
@@ -149,7 +151,7 @@ layout = dmc.Container(
 app.layout = dmc.MantineProvider(
     layout,
     theme={
-        "primaryColor": "indigo",
+        "primaryColor": "green",
         "defaultRadius": "sm",
         "components": {"Card": {"defaultProps": {"shadow": "sm"}}},
     },
@@ -168,8 +170,8 @@ app.layout = dmc.MantineProvider(
 )
 def update(color, radius, shadow, theme):
     theme["primaryColor"] = theme_name_mapping[color]
-    theme["defaultRadius"] = radius_name_mapping[radius]
-    theme["components"]["Card"]["defaultProps"]["shadow"] = radius_name_mapping[shadow]
+    theme["defaultRadius"] = size_name_mapping[radius]
+    theme["components"]["Card"]["defaultProps"]["shadow"] = size_name_mapping[shadow]
     return theme, "theme=" + json.dumps(theme, indent=4)
 
 

@@ -13,6 +13,7 @@ chart = dmc.LineChart(
     dataKey="date",
     data=data,
     series=[{"name": "Apples"}],
+    strokeWidth=4
 )
 
 card = dmc.Card(

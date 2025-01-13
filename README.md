@@ -1,11 +1,17 @@
 
 # Dash Mantine Components Theme Builder
 
+Mantine comes with a great default theme that works in both light and dark modes. If you’re new to Dash Mantine Components (DMC),
+it’s best to start with the default theme. It’s designed to make your apps look great without needing to write any additional CSS.
+
+If you want to customize the theme, start by making changes to the  **[Theme Object](https://www.dash-mantine-components.com/theme-object)** in the `MantineProvider`. This lets you set global defaults, ensuring a consistent design across your app and reducing the need for individual component overrides.
+
+
 ### Customize Your Dash App's Theme  
 
-Mantine comes with a great default theme that works in both light and dark modes. This theme is defined in a **[Theme Object](https://www.dash-mantine-components.com/theme-object)**, which is a dictionary of settings you can change to suit your needs.  
+The theme is defined in a `theme` object, which is a dictionary of settings you can change to suit your needs.  You can customize things like colors, border radius, spacing and breakpoints, fonts and text styles, component defaults and more!
 
-You can customize things like colors, border radius, spacing and breakpoints, fonts and text styles, component defaults and more! To make changes, simply create a new theme dictionary with your settings. Mantine will automatically merge it with the default theme, so you only need to include what you want to change.  
+To make changes, simply create a new theme dictionary with your settings. Mantine will automatically merge it with the default theme, so you only need to include what you want to change.  
 
 For a full list of options, check out the **[Theme Object documentation](https://www.dash-mantine-components.com/theme-object)**.  
 
@@ -45,8 +51,9 @@ theme = {
 }
 
 app.layout = dmc.MantineProvider(
+    children=[],  # Add your app layout here
     theme=theme,
-    children=[]  # Add your app layout here
+    forceColorScheme="dark"  # "light" is the default    
 )
 ```  
 
@@ -61,3 +68,6 @@ For further details and advanced theming techniques, visit the Dash Mantine Comp
 - **[Mantine API Overview](https://www.dash-mantine-components.com/mantine-api)**: High-level overview of Mantine's styling and theming options.  
 - **[Theme Object](https://www.dash-mantine-components.com/theme-object)**: In-depth guide to customizing the default theme.  
 - **[Styles API](https://www.dash-mantine-components.com/styles-api)**: How to override styles globally or at the component level.  
+
+
+This project is inspired by [Mantine Theme Builder](https://github.com/RubixCube-Innovations/mantine-theme-builder)
