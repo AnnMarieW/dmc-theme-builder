@@ -186,6 +186,7 @@ app.layout = dmc.MantineProvider(
 def update(color, radius, shadow, theme):
     try:
         theme["primaryColor"] = theme_name_mapping[color]
+        theme.pop("colors")
     except KeyError:
         new_colors = generate_color_shades(color)
         theme["colors"] = {
