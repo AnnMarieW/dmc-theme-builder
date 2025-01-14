@@ -107,7 +107,7 @@ see_code = dmc.Box(
         dmc.Button("copy theme code", id="modal-code-button", variant="outline"),
         dmc.Modal(
             [
-                dmc.CodeHighlight(id="json", code="", language="json", h=300),
+                dmc.CodeHighlight(id="json", code="", language="json", h=300, style={"overflow": "auto"}),
                 dmc.Text("dmc.MantineProvider(theme=theme)"),
             ],
             zIndex=1000,
