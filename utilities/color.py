@@ -26,7 +26,6 @@ def generate_colors_map(hex_color):
     hsl_color = colorsys.rgb_to_hls(*rgb_color)
     closest_lightness = get_closest_lightness(hsl_color)
     base_color_index = LIGHTNESS_MAP.index(closest_lightness)
-    print(closest_lightness, base_color_index)
 
     colors = []
     for i, l in enumerate(LIGHTNESS_MAP):
