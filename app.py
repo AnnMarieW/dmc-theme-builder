@@ -1,7 +1,7 @@
 import json
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from dash import Dash, _dash_renderer, Input, Output, State, callback
+from dash import Dash, _dash_renderer, Input, Output, State, callback, ctx, no_update
 from components import progress_card
 from components import theme_switch
 from components import figures
@@ -20,6 +20,10 @@ colors = dmc.DEFAULT_THEME["colors"]
 color_picker_value_mapping = {color: codes[5] for color, codes in colors.items() if color != "dark"}
 theme_name_mapping = {codes[5]: color for color, codes in colors.items() if color != "dark"}
 size_name_mapping = {1: "xs", 2: "sm", 3: "md", 4: "lg", 5: "xl"}
+color_picker_value_mapping_reverse = {
+    v: k for k, v in color_picker_value_mapping.items()
+}
+
 
 color_picker = dmc.Stack(
     [
@@ -31,7 +35,9 @@ color_picker = dmc.Stack(
             swatchesPerRow=7,
             value=color_picker_value_mapping["green"],
         ),
-    ]
+        dmc.TextInput(id="color-picker-textinput", value="green", debounce=True),
+    ],
+    gap="sm",
 )
 
 
@@ -178,17 +184,25 @@ app.layout = dmc.MantineProvider(
 @callback(
     Output("mantine-provider", "theme"),
     Output("json", "code"),
+    Output("color-picker-textinput", "value"),
+    Output("color-picker", "value"),
     Input("color-picker", "value"),
+    Input("color-picker-textinput", "value"),
     Input("radius", "value"),
     Input("shadow", "value"),
     State("mantine-provider", "theme"),
 )
-def update(color, radius, shadow, theme):
-    try:
+def update(color, color_text, radius, shadow, theme):
+    if ctx.triggered_id == "color-picker-textinput":
+        color = color_picker_value_mapping.get(color_text, color_text)
+    if color in theme_name_mapping:
         theme["primaryColor"] = theme_name_mapping[color]
-        theme.pop("colors")
-    except KeyError:
-        new_colors = generate_color_shades(color)
+        theme.pop("colors", None)
+    else:
+        try:
+            new_colors = generate_color_shades(color)
+        except ValueError:
+            return [no_update] * 4
         theme["colors"] = {
             "myColor": new_colors
         }
@@ -196,7 +210,12 @@ def update(color, radius, shadow, theme):
         theme["primaryShade"] = 4
     theme["defaultRadius"] = size_name_mapping[radius]
     theme["components"]["Card"]["defaultProps"]["shadow"] = size_name_mapping[shadow]
-    return theme, "theme=" + json.dumps(theme, indent=4)
+    return (
+        theme,
+        "theme=" + json.dumps(theme, indent=4),
+        color_picker_value_mapping_reverse.get(color, color),
+        color,
+    )
 
 
 @callback(
