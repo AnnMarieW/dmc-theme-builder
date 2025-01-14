@@ -9,7 +9,7 @@ from components import authentication
 from components import sample_components
 from components import stepper
 from components import date_picker
-import colorsys
+from utilities.color import generate_colors
 
 
 _dash_renderer._set_react_version("18.2.0")
@@ -17,8 +17,12 @@ _dash_renderer._set_react_version("18.2.0")
 app = Dash(external_stylesheets=dmc.styles.ALL)
 
 colors = dmc.DEFAULT_THEME["colors"]
-color_picker_value_mapping = {color: codes[5] for color, codes in colors.items() if color != "dark"}
-theme_name_mapping = {codes[5]: color for color, codes in colors.items() if color != "dark"}
+color_picker_value_mapping = {
+    color: codes[5] for color, codes in colors.items() if color != "dark"
+}
+theme_name_mapping = {
+    codes[5]: color for color, codes in colors.items() if color != "dark"
+}
 size_name_mapping = {1: "xs", 2: "sm", 3: "md", 4: "lg", 5: "xl"}
 color_picker_value_mapping_reverse = {
     v: k for k, v in color_picker_value_mapping.items()
@@ -40,22 +44,6 @@ color_picker = dmc.Stack(
     gap="sm",
 )
 
-
-def generate_color_shades(hex_color):
-    hex_color = hex_color.lstrip('#')
-    r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-    h, l, s = colorsys.rgb_to_hls(r/255, g/255, b/255)
-
-    shades_l = [1.0 - (i/9) for i in range(10)]
-    shades_l[4] = l  # Put the original color in the middle
-
-    shades = []
-    for val in shades_l:
-        rr, gg, bb = colorsys.hls_to_rgb(h, val, s)
-        new_hex = f"#{int(rr*255):02x}{int(gg*255):02x}{int(bb*255):02x}"
-        shades.append(new_hex)
-
-    return shades
 
 def make_slider(title, id):
     return dmc.Stack(
@@ -93,7 +81,12 @@ customize_theme = dmc.Box(
                         color_picker,
                         make_slider("Radius", "radius"),
                         make_slider("Shadow", "shadow"),
-                        dmc.Group([theme_switch.theme_toggle, dmc.Text("light/dark color scheme", size="sm", pt="sm")])
+                        dmc.Group(
+                            [
+                                theme_switch.theme_toggle,
+                                dmc.Text("light/dark color scheme", size="sm", pt="sm"),
+                            ]
+                        ),
                     ],
                     bd="1px solid gray.3",
                     p="sm",
@@ -113,7 +106,13 @@ see_code = dmc.Box(
         dmc.Button("copy theme code", id="modal-code-button", variant="outline"),
         dmc.Modal(
             [
-                dmc.CodeHighlight(id="json", code="", language="json", h=300, style={"overflow": "auto"}),
+                dmc.CodeHighlight(
+                    id="json",
+                    code="",
+                    language="json",
+                    h=300,
+                    style={"overflow": "auto"},
+                ),
                 dmc.Text("dmc.MantineProvider(theme=theme)"),
             ],
             zIndex=1000,
@@ -124,9 +123,11 @@ see_code = dmc.Box(
     ]
 )
 
-github_link =  dmc.Anchor(
+github_link = dmc.Anchor(
     dmc.ActionIcon(
-        DashIconify(icon= "radix-icons:github-logo", width=25), variant="transparent", size="lg"
+        DashIconify(icon="radix-icons:github-logo", width=25),
+        variant="transparent",
+        size="lg",
     ),
     href="https://github.com/AnnMarieW/dmc-theme-builder",
     target="_blank",
@@ -153,10 +154,13 @@ sample_app = dmc.Box(
 
 layout = dmc.Container(
     [
-        dmc.Group([
-            dmc.Title("Dash Mantine Components Theme Builder", order=1, mt="lg"),
-            github_link
-        ], justify="space-between"),
+        dmc.Group(
+            [
+                dmc.Title("Dash Mantine Components Theme Builder", order=1, mt="lg"),
+                github_link,
+            ],
+            justify="space-between",
+        ),
         dmc.Title(
             "Set default color, radius, shadow, and color scheme", order=3, mb="lg"
         ),
@@ -165,7 +169,7 @@ layout = dmc.Container(
         dmc.Space(h=60),
         sample_app,
     ],
- #   fluid=True,
+    #   fluid=True,
     mb="lg",
 )
 
@@ -200,14 +204,11 @@ def update(color, color_text, radius, shadow, theme):
         theme.pop("colors", None)
     else:
         try:
-            new_colors = generate_color_shades(color)
+            base_color_index, new_colors = generate_colors(color)
         except ValueError:
             return [no_update] * 4
-        theme["colors"] = {
-            "myColor": new_colors
-        }
+        theme["colors"] = {"myColor": new_colors}
         theme["primaryColor"] = "myColor"
-        theme["primaryShade"] = 4
     theme["defaultRadius"] = size_name_mapping[radius]
     theme["components"]["Card"]["defaultProps"]["shadow"] = size_name_mapping[shadow]
     return (
