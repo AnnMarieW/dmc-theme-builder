@@ -214,7 +214,7 @@ def modal_demo(n, opened):
     State("modal-code", "opened"),
     prevent_initial_call=True,
 )
-def modal_demo(n, opened):
+def modal_code(n, opened):
     return not opened
 
 
