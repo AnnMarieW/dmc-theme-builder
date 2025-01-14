@@ -9,6 +9,8 @@ from components import authentication
 from components import sample_components
 from components import stepper
 from components import date_picker
+import colorsys
+
 
 _dash_renderer._set_react_version("18.2.0")
 
@@ -25,7 +27,6 @@ color_picker = dmc.Stack(
         dmc.ColorPicker(
             id="color-picker",
             size="sm",
-            withPicker=False,
             swatches=list(color_picker_value_mapping.values()),
             swatchesPerRow=7,
             value=color_picker_value_mapping["green"],
@@ -33,6 +34,22 @@ color_picker = dmc.Stack(
     ]
 )
 
+
+def generate_color_shades(hex_color):
+    hex_color = hex_color.lstrip('#')
+    r, g, b = (int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+    h, l, s = colorsys.rgb_to_hls(r/255, g/255, b/255)
+
+    shades_l = [1.0 - (i/9) for i in range(10)]
+    shades_l[4] = l  # Put the original color in the middle
+
+    shades = []
+    for val in shades_l:
+        rr, gg, bb = colorsys.hls_to_rgb(h, val, s)
+        new_hex = f"#{int(rr*255):02x}{int(gg*255):02x}{int(bb*255):02x}"
+        shades.append(new_hex)
+
+    return shades
 
 def make_slider(title, id):
     return dmc.Stack(
@@ -167,7 +184,15 @@ app.layout = dmc.MantineProvider(
     State("mantine-provider", "theme"),
 )
 def update(color, radius, shadow, theme):
-    theme["primaryColor"] = theme_name_mapping[color]
+    try:
+        theme["primaryColor"] = theme_name_mapping[color]
+    except KeyError:
+        new_colors = generate_color_shades(color)
+        theme["colors"] = {
+            "myColor": new_colors
+        }
+        theme["primaryColor"] = "myColor"
+        theme["primaryShade"] = 4
     theme["defaultRadius"] = size_name_mapping[radius]
     theme["components"]["Card"]["defaultProps"]["shadow"] = size_name_mapping[shadow]
     return theme, "theme=" + json.dumps(theme, indent=4)
