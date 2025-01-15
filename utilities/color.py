@@ -11,40 +11,35 @@ def hex_to_rgb(hex_color):
 
 def rgb_to_hex(rgb_color):
     return "#{:02x}{:02x}{:02x}".format(
-        int(rgb_color[0] * 255), int(rgb_color[1] * 255), int(rgb_color[2] * 255)
+        int(rgb_color[0] * 255),
+        int(rgb_color[1] * 255),
+        int(rgb_color[2] * 255),
     )
 
 
 def get_closest_lightness(hsl_color):
-    lightness_goal = hsl_color[2]
-    closest_lightness = min(LIGHTNESS_MAP, key=lambda l: abs(l - lightness_goal))
-    return closest_lightness
-
+    # Use hsl_color[1] for lightness
+    lightness_goal = hsl_color[1]
+    return min(LIGHTNESS_MAP, key=lambda l: abs(l - lightness_goal))
 
 def generate_colors_map(hex_color):
     rgb_color = hex_to_rgb(hex_color)
-    hsl_color = colorsys.rgb_to_hls(*rgb_color)
-    closest_lightness = get_closest_lightness(hsl_color)
+    # hls => (hue, lightness, saturation)
+    h, l, s = colorsys.rgb_to_hls(*rgb_color)
+
+    # Get the closest lightness index
+    closest_lightness = get_closest_lightness((h, l, s))
     base_color_index = LIGHTNESS_MAP.index(closest_lightness)
 
     colors = []
-    for i, l in enumerate(LIGHTNESS_MAP):
-        new_hsl = (hsl_color[0], l, hsl_color[2])
-
-        saturation_delta = SATURATION_MAP[i] - SATURATION_MAP[base_color_index]
-        new_saturation = (
-            hsl_color[2] + saturation_delta
-            if saturation_delta >= 0
-            else hsl_color[2] - abs(saturation_delta)
-        )
-        new_hsl = (hsl_color[0], l, new_saturation)
-
-        new_rgb = colorsys.hls_to_rgb(*new_hsl)
+    for i, target_lightness in enumerate(LIGHTNESS_MAP):
+        # Adjust saturation by difference from base index
+        sat_delta = SATURATION_MAP[i] - SATURATION_MAP[base_color_index]
+        new_s = min(max(s + sat_delta, 0), 1)  # clamp between 0 and 1
+        new_hls = (h, target_lightness, new_s)
+        new_rgb = colorsys.hls_to_rgb(*new_hls)
         colors.append(rgb_to_hex(new_rgb))
-
     return base_color_index, colors
-
 
 def generate_colors(hex_color):
-    base_color_index, colors = generate_colors_map(hex_color)
-    return base_color_index, colors
+    return generate_colors_map(hex_color)
