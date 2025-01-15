@@ -28,6 +28,9 @@ color_picker_value_mapping_reverse = {
     v: k for k, v in color_picker_value_mapping.items()
 }
 
+def color_swatches(colors):
+    """Create a list of color swatches for the color picker."""
+    return [dmc.Paper(bg=color, p="xs", radius="xs") for color in colors]
 
 color_picker = dmc.Stack(
     [
@@ -38,8 +41,15 @@ color_picker = dmc.Stack(
             swatches=list(color_picker_value_mapping.values()),
             swatchesPerRow=7,
             value=color_picker_value_mapping["green"],
+            fullWidth=True,
         ),
         dmc.TextInput(id="color-picker-textinput", value="green", debounce=True),
+        dmc.Group(
+            color_swatches(list(color_picker_value_mapping.values())),
+            gap=2,
+            grow=True,
+            id="shade-swatches",
+        ),
     ],
     gap="sm",
 )
@@ -190,6 +200,7 @@ app.layout = dmc.MantineProvider(
     Output("json", "code"),
     Output("color-picker-textinput", "value"),
     Output("color-picker", "value"),
+    Output("shade-swatches", "children"),
     Input("color-picker", "value"),
     Input("color-picker-textinput", "value"),
     Input("radius", "value"),
@@ -202,12 +213,13 @@ def update(color, color_text, radius, shadow, theme):
     if color in theme_name_mapping:
         theme["primaryColor"] = theme_name_mapping[color]
         theme.pop("colors", None)
+        color_shades = dmc.DEFAULT_THEME["colors"][theme["primaryColor"]]
     else:
         try:
-            base_color_index, new_colors = generate_colors(color)
+            base_color_index, color_shades = generate_colors(color)
         except ValueError:
             return [no_update] * 4
-        theme["colors"] = {"myColor": new_colors}
+        theme["colors"] = {"myColor": color_shades}
         theme["primaryColor"] = "myColor"
     theme["defaultRadius"] = size_name_mapping[radius]
     theme["components"]["Card"]["defaultProps"]["shadow"] = size_name_mapping[shadow]
@@ -216,6 +228,7 @@ def update(color, color_text, radius, shadow, theme):
         "theme=" + json.dumps(theme, indent=4),
         color_picker_value_mapping_reverse.get(color, color),
         color,
+        color_swatches(color_shades),
     )
 
 
