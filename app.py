@@ -1,7 +1,7 @@
 import json
 import dash_mantine_components as dmc
 from dash_iconify import DashIconify
-from dash import Dash, _dash_renderer, Input, Output, State, callback
+from dash import Dash, Input, Output, State, callback
 from components import progress_card
 from components import theme_switch
 from components import figures
@@ -10,9 +10,7 @@ from components import sample_components
 from components import stepper
 from components import date_picker
 
-_dash_renderer._set_react_version("18.2.0")
-
-app = Dash(external_stylesheets=dmc.styles.ALL)
+app = Dash()
 
 colors = dmc.DEFAULT_THEME["colors"]
 color_picker_value_mapping = {color: codes[5] for color, codes in colors.items() if color != "dark"}
@@ -194,4 +192,4 @@ def modal_demo(n, opened):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8053)
